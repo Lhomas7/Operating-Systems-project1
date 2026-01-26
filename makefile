@@ -9,3 +9,6 @@ run:
 	LD_PRELOAD=./mem_shim.so ./leakcount
 	./sctracer
 
+clean:
+	rm mem_shim.so leakcount sctracer
+

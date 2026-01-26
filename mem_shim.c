@@ -6,7 +6,7 @@
 
 
 size_t totalLeak = 0;
-FILE* fptr;
+FILE* fptr = NULL;
 
 __attribute__((destructor)) void destroy(void) {
 
@@ -25,6 +25,9 @@ void free(void *ptr) {
 }
 
 void* malloc(size_t size) {
+    if (!fptr) {
+        fptr = fopen("info.txt", "w");
+    }
     void *(*original_malloc) (size_t size1);
     original_malloc = dlsym(RTLD_NEXT, "malloc");
     totalLeak += size;
@@ -33,6 +36,9 @@ void* malloc(size_t size) {
 }
 
 void* calloc(size_t count, size_t size) {
+    if (!fptr) {
+        fptr = fopen("info.txt", "w");
+    }
     void *(*original_calloc) (size_t count1, size_t size1);
     original_calloc = dlsym(RTLD_NEXT, "calloc");
     totalLeak += size;
