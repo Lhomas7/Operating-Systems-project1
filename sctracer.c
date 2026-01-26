@@ -14,11 +14,11 @@
 int main(int argc, char **argv) {
     pid_t p = fork();
     if (p == 0) {
-        printf("Hi I'm a child");
+        printf("Hi I'm a child\n");
 
     }
     else {
-        printf("Hi I'm a parent");
+        printf("Hi I'm a parent\n");
     }
 
     return 0;
