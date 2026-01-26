@@ -9,8 +9,9 @@ size_t totalLeak = 0;
 FILE* fptr = NULL;
 
 __attribute__((destructor)) void destroy(void) {
-
-    fclose(fptr);
+    if (fptr) {
+        fclose(fptr);
+    }
 }
 
 
