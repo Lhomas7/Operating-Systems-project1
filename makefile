@@ -6,7 +6,7 @@ compile:
 	gcc -Wall sctracer.c -o sctracer
 
 run:
-	LD_PRELOAD=./mem_shim.so ./leakcount
+	LD_PRELOAD=./mem_shim.so 
 	./sctracer
 
 clean:
