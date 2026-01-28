@@ -13,7 +13,6 @@ typedef struct {
 
 ptrData* allocatedPtrs = NULL;
 
-
 __attribute__((destructor)) void destroy(void) {
     void *(*original_free) (void *ptr1);
     original_free = dlsym(RTLD_NEXT, "free");
@@ -55,6 +54,7 @@ void free(void *ptr) {
 void* malloc(size_t size) {
     void *(*original_realloc) (void* vptr, size_t newSize);
     original_realloc = dlsym(RTLD_NEXT, "realloc");
+
     
     void *(*original_malloc) (size_t size1);
     original_malloc = dlsym(RTLD_NEXT, "malloc");

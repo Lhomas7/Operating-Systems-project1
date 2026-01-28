@@ -13,12 +13,27 @@
 
 int main(int argc, char **argv) {
     pid_t p = fork();
+    char* newArgs[argc + 1];
     if (p == 0) {
-        printf("Hi I'm a child\n");
+        for (int i = 1; i < argc; ++i) {
+            strcpy(newArgs[i - 1], argv[i]);
+        }
+        newArgs[argc] = NULL;
+
+        ptrace(PTRACE_TRACEME);
+
+        kill(getpid(), SIGSTOP);
+        child = getpid();
+        execvp(newArgs[0], newArgs); 
+
+        
 
     }
     else {
-        printf("Hi I'm a parent\n");
+        int staus, syscall_num;
+        waitpid(child, &status, 0);
+
+        ptrace(PTRACE_SETOPTIONS, child, 0, PTRACE_O_TRACESYSGOOD);
     }
 
     return 0;
