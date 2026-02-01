@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/wait.h>
@@ -7,18 +8,20 @@
 int main(int argc, char** argv) {
     pid_t p = fork();
     char* newArgs[argc];
+    char* evs[] = {"LD_PRELOAD=./mem_shim.so", NULL};
     if (p == 0) {
-        //char* newArgs[] = {"./a.out", NULL};
-        for (int i = 1; i < argc - 1; ++i) {
-            strcpy(newArgs[i - 1], argv[i]);
+        int k = 0;
+        for (int i = 1; i < argc; ++i) {
+                newArgs[k] = argv[i];
+                k++;
         }
-        newArgs[argc - 1] = NULL;
-        execvp(newArgs[0], newArgs);         
+
+        newArgs[k] = NULL;
+        execvpe(newArgs[0], newArgs, evs);
     }
     else {
         wait(NULL);
-        printf("exec function Failed!\n");
-        
+
     }
 
     return 0;
