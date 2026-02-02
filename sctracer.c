@@ -1,6 +1,7 @@
 
 #define _GNU_SOURCE
 #include <sys/ptrace.h>
+#include <sys/user.h>
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -12,6 +13,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdbool.h>
+
 typedef struct {
     int syscall_num;
     int count;
@@ -39,7 +41,6 @@ int main(int argc, char **argv) {
     }
     else {
         int status, syscall_num;
-        FILE* outFile = argv[2];
         waitpid(child, &status, 0);
 
         syscall_info* syscalls = NULL;
@@ -57,10 +58,11 @@ int main(int argc, char **argv) {
                 //get the system call number
                 syscall_num = ptrace(PTRACE_PEEKUSER, child, sizeof(long)*ORIG_RAX, NULL);
             }
-
-            int i = 0;
-            while(syscalls[i].syscall_num != syscall_num && i < syscall_size) {
-                ++i;
+            if (syscall_size) {
+                int i = 0;
+                while(syscalls[i].syscall_num != syscall_num && i < syscall_size) {
+                    ++i;
+                }
             }
             if (i == syscall_size) {
                 syscall_info call = {syscall_num, 1};
