@@ -63,14 +63,26 @@ int main(int argc, char **argv) {
                 while(syscalls[i].syscall_num != syscall_num && i < syscall_size) {
                     ++i;
                 }
+            
+                if (i == syscall_size) {
+                    syscall_info call = {syscall_num, 1};
+                    syscalls = realloc(syscalls, ++syscall_size * sizeof(syscall_info));
+                    syscalls[syscall_size - 1] = call;
+                }
+                else {
+                    if (i) {
+                        ++syscalls[i - 1].count;
+                    }
+                    else {
+                        ++syscalls[i].count;
+                    }
+                }
             }
-            if (i == syscall_size) {
+            else {
                 syscall_info call = {syscall_num, 1};
                 syscalls = realloc(syscalls, ++syscall_size * sizeof(syscall_info));
                 syscalls[syscall_size - 1] = call;
-            }
-            else {
-                ++syscalls[i - 1].count;
+
             }
             //printf("%d",syscall_num);
 
