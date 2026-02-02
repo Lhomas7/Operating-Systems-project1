@@ -11,6 +11,11 @@
 #include <errno.h>
 #include <string.h>
 #include <time.h>
+#include <stdbool.h>
+typedef struct {
+    int syscall_num;
+    int count;
+}syscall_info;
 
 int main(int argc, char **argv) {
     pid_t p = fork();
@@ -40,6 +45,9 @@ int main(int argc, char **argv) {
         int status, syscall_num;
         waitpid(child, &status, 0);
 
+        syscall_info* syscalls = NULL;
+        int syscall_size = 0;
+
         //make it easier to differentiate system calls from traps
         ptrace(PTRACE_SETOPTIONS, child, 0, PTRACE_O_TRACESYSGOOD);
 
@@ -52,11 +60,28 @@ int main(int argc, char **argv) {
                 //get the system call number
                 syscall_num = ptrace(PTRACE_PEEKUSER, child, sizeof(long)*ORIG_RAX, NULL);
             }
-            printf("%d",syscall_num);
+
+            int i = 0;
+            while(syscalls[i].syscall_num != syscall_num && i < syscall_size) {
+                ++i;
+            }
+            if (i == syscall_size) {
+                syscall_info call = {syscall_num, 1};
+                syscalls = realloc(syscalls, ++syscall_size * sizeof(syscall_info));
+                syscalls[syscall_size - 1] = call;
+            }
+            else {
+                ++syscalls[i - 1].count;
+            }
+            //printf("%d",syscall_num);
 
             ptrace(PTRACE_CONT, child, NULL, NULL);
-
+            waitpid(child, &status, 0);
         }
+        for (int i = 0; i < syscall_size; ++i) {
+            printf("%d\t%d"syscalls[i].syscall_num, syscalls[i].count);
+        }
+        free(syscalls);
     }
 
     return 0;
