@@ -7,7 +7,5 @@ int main() {
 
     free(ptr1);
 
-    //printf("Successful call to exec!!");
-
     return 0;
 }
