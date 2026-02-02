@@ -18,8 +18,8 @@ typedef struct {
 }syscall_info;
 
 int main(int argc, char **argv) {
-    pid_t p = fork();
-    if (p == 0) {
+    pid_t child = fork();
+    if (child == 0) {
         char* newArgs[argc];
         int k = 0;
         for (int i = 1; i < argc; ++i) {
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
             waitpid(child, &status, 0);
         }
         for (int i = 0; i < syscall_size; ++i) {
-            printf("%d\t%d"syscalls[i].syscall_num, syscalls[i].count);
+            printf("%d\t%d",syscalls[i].syscall_num, syscalls[i].count);
         }
         free(syscalls);
     }
