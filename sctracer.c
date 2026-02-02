@@ -20,14 +20,10 @@ typedef struct {
 int main(int argc, char **argv) {
     pid_t child = fork();
     if (child == 0) {
-        char* newArgs[argc];
-        int k = 0;
-        for (int i = 1; i < argc; ++i) {
-                newArgs[k] = argv[i];
-                k++;
-        }
+        char* newArgs[2];
 
-        newArgs[k] = NULL;
+        newArgs[0] = argv[1];
+        newArgs[1] = NULL;
 
         //get ready to trace myself
         ptrace(PTRACE_TRACEME);
@@ -36,13 +32,14 @@ int main(int argc, char **argv) {
         child = getpid();
 
         //execute program to trace system calls from
-        execvp(newArgs[0],newArgs); 
+        execv(newArgs[0],newArgs); 
 
         
 
     }
     else {
         int status, syscall_num;
+        FILE* outFile = argv[2];
         waitpid(child, &status, 0);
 
         syscall_info* syscalls = NULL;
@@ -78,9 +75,12 @@ int main(int argc, char **argv) {
             ptrace(PTRACE_CONT, child, NULL, NULL);
             waitpid(child, &status, 0);
         }
+
+        FILE* outFile = fopen(argv[2], "w");
         for (int i = 0; i < syscall_size; ++i) {
-            printf("%d\t%d",syscalls[i].syscall_num, syscalls[i].count);
+            fprintf(outFile, "%d\t%d",syscalls[i].syscall_num, syscalls[i].count);
         }
+        fclose(outFile);
         free(syscalls);
     }
 
