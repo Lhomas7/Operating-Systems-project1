@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
             //wait for child status to change
             ptrace(PTRACE_SYSCALL, child, 0, 0);
             
-            if(WIFSTOPPED(status) && !(WSTOPSIG(status) & 0x80)) {
+            if(WIFSTOPPED(status) && WSTOPSIG(status) & 0x80) {
                 //get the system call number
                 syscall_num = ptrace(PTRACE_PEEKUSER, child, sizeof(long)*ORIG_RAX, NULL);
             }
