@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
 
         FILE* outFile = fopen(argv[2], "w");
         for (int i = 0; i < syscall_size; ++i) {
-            fprintf(outFile, "%d\t%d",syscalls[i].syscall_num, syscalls[i].count);
+            fprintf(outFile, "%d\t%d\n",syscalls[i].syscall_num, syscalls[i].count);
         }
         fclose(outFile);
         free(syscalls);
