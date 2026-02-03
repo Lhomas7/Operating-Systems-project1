@@ -4,7 +4,7 @@
 #include <sys/wait.h>
 #include <stdio.h>
 #include <string.h>
-#define SET_ENV = "LD_PRELOAD=./mem_shim.so"
+#define SET_ENV "LD_PRELOAD=./mem_shim.so"
 
 int main(int argc, char** argv) {
     pid_t p = fork();

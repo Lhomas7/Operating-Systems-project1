@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
         ptrace(PTRACE_TRACEME);
 
         kill(getpid(), SIGSTOP);
-        child = getpid();
+        //child = getpid();
 
         //execute program to trace system calls from
         execv(newArgs[0],newArgs); 
@@ -48,45 +48,50 @@ int main(int argc, char **argv) {
 
         //make it easier to differentiate system calls from traps
         ptrace(PTRACE_SETOPTIONS, child, 0, PTRACE_O_TRACESYSGOOD);
+        ptrace(PTRACE_SYSCALL, child, 0, 0);
 
         //keep tracking until the child program is finished
         while (!WIFEXITED(status)) {
             //wait for child status to change
-            ptrace(PTRACE_SYSCALL, child, 0, 0);
+            //ptrace(PTRACE_SYSCALL, child, 0, 0);
             
             if(WIFSTOPPED(status) && WSTOPSIG(status) & 0x80) {
                 //get the system call number
-                syscall_num = ptrace(PTRACE_PEEKUSER, child, sizeof(long)*ORIG_RAX, NULL);
-            }
-            if (syscall_size) {
-                int i = 0;
-                while(syscalls[i].syscall_num != syscall_num && i < syscall_size) {
-                    ++i;
-                }
+                struct ptrace_syscall_info psi;
+                ptrace(PTRACE_GET_SYSCALL_INFO, child, sizeof(struct ptrace_syscall_info), &psi);
+                syscall_num = psi.entry.nr;
+                if (psi.op == PTRACE_SYSCALL_INFO_ENTRY) {
+                    if (syscall_size) {
+                        int i = 0;
+                        while(syscalls[i].syscall_num != syscall_num && i < syscall_size) {
+                        ++i;
+                        }
             
-                if (i == syscall_size) {
-                    syscall_info call = {syscall_num, 1};
-                    syscalls = realloc(syscalls, ++syscall_size * sizeof(syscall_info));
-                    syscalls[syscall_size - 1] = call;
-                }
-                else {
-                    if (i) {
-                        ++syscalls[i - 1].count;
+                        if (i == syscall_size) {
+                            syscall_info call = {syscall_num, 1};
+                            syscalls = realloc(syscalls, ++syscall_size * sizeof(syscall_info));
+                            syscalls[syscall_size - 1] = call;
+                        }
+                        else {
+                            if (i) {
+                                ++syscalls[i - 1].count;
+                            }
+                            else {
+                                ++syscalls[i].count;
+                            }
+                        }
                     }
                     else {
-                        ++syscalls[i].count;
+                        syscall_info call = {syscall_num, 1};
+                        syscalls = realloc(syscalls, ++syscall_size * sizeof(syscall_info));
+                        syscalls[syscall_size - 1] = call;
+
                     }
                 }
-            }
-            else {
-                syscall_info call = {syscall_num, 1};
-                syscalls = realloc(syscalls, ++syscall_size * sizeof(syscall_info));
-                syscalls[syscall_size - 1] = call;
-
             }
             //printf("%d",syscall_num);
 
-            ptrace(PTRACE_CONT, child, NULL, NULL);
+            ptrace(PTRACE_SYSCALL, child, 0, 0);
             waitpid(child, &status, 0);
         }
 
