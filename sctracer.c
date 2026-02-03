@@ -1,6 +1,7 @@
 
 #define _GNU_SOURCE
 #include <sys/ptrace.h>
+#include <linux/ptrace.h>
 #include <sys/user.h>
 #include <sys/wait.h>
 #include <sys/types.h>
@@ -95,6 +96,8 @@ int main(int argc, char **argv) {
             waitpid(child, &status, 0);
         }
 
+        //send call numbers and their counts to output file
+        //in descending order
         FILE* outFile = fopen(argv[2], "w");
         for (int i = 0; i < syscall_size; ++i) {
             fprintf(outFile, "%d\t%d\n",syscalls[i].syscall_num, syscalls[i].count);
