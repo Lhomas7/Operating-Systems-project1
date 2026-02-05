@@ -54,14 +54,16 @@ int main(int argc, char **argv) {
         //keep tracking until the child program is finished
         while (!WIFEXITED(status)) {
             //wait for child status to change
-            //ptrace(PTRACE_SYSCALL, child, 0, 0);
             
             if(WIFSTOPPED(status) && WSTOPSIG(status) & 0x80) {
                 //get the system call number
                 struct ptrace_syscall_info psi;
                 ptrace(PTRACE_GET_SYSCALL_INFO, child, sizeof(struct ptrace_syscall_info), &psi);
                 syscall_num = psi.entry.nr;
+                //check if we are getting an entry number or not
                 if (psi.op == PTRACE_SYSCALL_INFO_ENTRY) {
+                    //if there have already been system calls, iterate through and check if the current one has
+                    //occurred or not, then adjust array accordingly
                     if (syscall_size) {
                         int i = 0;
                         while(syscalls[i].syscall_num != syscall_num && i < syscall_size) {
@@ -82,6 +84,7 @@ int main(int argc, char **argv) {
                             }
                         }
                     }
+                    //if the call is new, create a new instance and store it
                     else {
                         syscall_info call = {syscall_num, 1};
                         syscalls = realloc(syscalls, ++syscall_size * sizeof(syscall_info));
@@ -95,6 +98,8 @@ int main(int argc, char **argv) {
             ptrace(PTRACE_SYSCALL, child, 0, 0);
             waitpid(child, &status, 0);
         }
+
+        //TODO: sort array from smallest to largest system call #
 
         //send call numbers and their counts to output file
         //in descending order
