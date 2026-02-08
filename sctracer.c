@@ -103,12 +103,13 @@ int main(int argc, char **argv) {
         }
 
         //TODO: sort array from smallest to largest system call #
-        
-        int count = 0 
+
+        int count = 0;
         int min;
-        int index = 0;
+        int index;
         while (count < syscall_size) {
             min = syscalls[count].syscall_num;
+            index = count;
             for (int i = 0; i < syscall_size; ++i) {
                 if (syscalls[i].syscall_num < min) {
                     min = syscalls[i].syscall_num;
@@ -117,7 +118,7 @@ int main(int argc, char **argv) {
             }
             syscall_info temp = syscalls[index];
             syscalls[index] = syscalls[count];
-            syscalls[count] = temp.
+            syscalls[count] = temp;
             ++count;
         }
         //send call numbers and their counts to output file
