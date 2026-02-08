@@ -15,11 +15,14 @@
 #include <time.h>
 #include <stdbool.h>
 
+//struct to hold the system call # and 
+//the number of occurrences
 typedef struct {
     int syscall_num;
     int count;
 }syscall_info;
 
+//main function
 int main(int argc, char **argv) {
     pid_t child = fork();
     if (child == 0) {
@@ -100,7 +103,23 @@ int main(int argc, char **argv) {
         }
 
         //TODO: sort array from smallest to largest system call #
-
+        
+        int count = 0 
+        int min;
+        int index = 0;
+        while (count < syscall_size) {
+            min = syscalls[count].syscall_num;
+            for (int i = 0; i < syscall_size; ++i) {
+                if (syscalls[i].syscall_num < min) {
+                    min = syscalls[i].syscall_num;
+                    index = i;
+                }
+            }
+            syscall_info temp = syscalls[index];
+            syscalls[index] = syscalls[count];
+            syscalls[count] = temp.
+            ++count;
+        }
         //send call numbers and their counts to output file
         //in descending order
         FILE* outFile = fopen(argv[2], "w");
