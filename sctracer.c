@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
         while (count < syscall_size) {
             min = syscalls[count].syscall_num;
             index = count;
-            for (int i = 0; i < syscall_size; ++i) {
+            for (int i = count; i < syscall_size; ++i) {
                 if (syscalls[i].syscall_num < min) {
                     min = syscalls[i].syscall_num;
                     index = i;
