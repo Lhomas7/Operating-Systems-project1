@@ -88,12 +88,7 @@ int main(int argc, char **argv) {
                             syscalls[syscall_size - 1] = call;
                         }
                         else {
-                            if (i) {
-                                ++syscalls[i - 1].count;
-                            }
-                            else {
-                                ++syscalls[i].count;
-                            }
+                            ++syscalls[i].count;
                         }
                     }
                     //if the call is new, create a new instance and store it
