@@ -1,4 +1,3 @@
-
 #define _GNU_SOURCE
 #include <sys/ptrace.h>
 #include <linux/ptrace.h>
@@ -24,18 +23,28 @@ typedef struct {
 
 //main function
 int main(int argc, char **argv) {
+    int cot = 0;
+
+    char* copy = malloc(strlen(argv[1]) + 1);
+    strcpy(copy, argv[1]);
+    char *tok = strtok(copy, " ");
+    char **newArgs = NULL;
+
+    while(tok != NULL) {
+            newArgs = realloc(newArgs, (cot + 1) * sizeof(*newArgs));
+            newArgs[cot++] = tok;
+            tok = strtok(NULL, " ");
+    }
+
+    newArgs = realloc(newArgs, (cot + 1) * sizeof(*newArgs));
+    newArgs[cot] = NULL;
     pid_t child = fork();
     if (child == 0) {
-        char* newArgs[2];
-
-        newArgs[0] = argv[1];
-        newArgs[1] = NULL;
 
         //get ready to trace myself
         ptrace(PTRACE_TRACEME);
 
         kill(getpid(), SIGSTOP);
-        //child = getpid();
 
         //execute program to trace system calls from
         execv(newArgs[0],newArgs); 
@@ -96,7 +105,6 @@ int main(int argc, char **argv) {
                     }
                 }
             }
-            //printf("%d",syscall_num);
 
             ptrace(PTRACE_SYSCALL, child, 0, 0);
             waitpid(child, &status, 0);
