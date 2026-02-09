@@ -31,3 +31,14 @@ will wait until a system call occurs, then once it does it stores the system
 call number and its number of occurrences throughout the program, doing so 
 only on an entry. Once the child process exits, the parent process sorts the
 call numbers from lowest to highest and prints the results to an output file
+
+# References
+Working on this project required me to know some library functions, how ptrace
+functioned, and also proper syntax for code. Below are listed the websites used
+as reference:
+
+https://man7.org/linux/man-pages/man2/ptrace.2.html (Linux manual page)
+
+https://www.geeksforgeeks.org/cpp/strtok-strtok_r-functions-c-examples/ (geeksforgeeks)
+
+https://linux.die.net/man/3/execv (linux manual page)
