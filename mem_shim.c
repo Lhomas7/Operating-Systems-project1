@@ -101,7 +101,7 @@ void* calloc(size_t count, size_t size) {
     //and allocate pointer data
     allocatedPtrs = original_realloc(allocatedPtrs, ++numPtrs * sizeof(ptrData));
     void* newData = original_calloc(count, size);
-    ptrData newPtr = {newData, size};
+    ptrData newPtr = {newData, count * size};
     allocatedPtrs[numPtrs - 1] = newPtr;
 
     //return the allocated pointer
